@@ -26,7 +26,7 @@ import { EMPTY_FILTER_STATE, type FilterState } from '../../utils/tableFilterTyp
 import { applyFilterState, countActiveConditions } from '../../utils/tableFilterUtils';
 import { ConditionFilterPanel } from './ConditionFilterPanel';
 
-const ROWS_PER_PAGE = 10;
+const ROWS_PER_PAGE = 15;
 
 const COLUMNS = [
   { field: 'id', headerName: 'Condition ID', type: 'string' as const },
