@@ -33,7 +33,8 @@ export default function CenterPane({
   return (
     <Box
       sx={{
-        flex: 1,
+        flex: '0 0 40%',
+        width: '40%',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',

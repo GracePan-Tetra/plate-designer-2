@@ -9,10 +9,9 @@ export interface PlateGeometry {
 
 export interface Condition {
   id: string;
-  factor1: string;
-  factor2: string;
-  factor3: string;
-  factor4: string;
+  load_challenge: number;
+  resin_name: string;
+  starting_material: string;
   color: string;
 }
 

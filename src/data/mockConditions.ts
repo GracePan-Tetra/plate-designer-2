@@ -11,13 +11,14 @@ export const CATEGORICAL_COLORS = [
   '#EC4899',
 ];
 
-const FACTOR1_VALUES = ['Control', 'Vehicle', 'Inhibitor', 'Activator', 'Positive', 'Cytokine'];
+const LOAD_CHALLENGES = [5, 20, 30, 80];
+const RESIN_NAMES = ['Capto Q', 'Capto S', 'MabSelect PrismA'];
+const STARTING_MATERIALS = ['Clarified Lysate', 'CHO Cell Culture', 'Harvested Media'];
 
 export const mockConditions: Condition[] = Array.from({ length: 120 }, (_, i) => ({
   id: `TAKBXXX${String(i + 1).padStart(3, '0')}`,
-  factor1: FACTOR1_VALUES[i % FACTOR1_VALUES.length],
-  factor2: 'Ibuprofen',
-  factor3: '10mg',
-  factor4: 'pH 7',
+  load_challenge: LOAD_CHALLENGES[i % LOAD_CHALLENGES.length],
+  resin_name: RESIN_NAMES[i % RESIN_NAMES.length],
+  starting_material: STARTING_MATERIALS[i % STARTING_MATERIALS.length],
   color: CATEGORICAL_COLORS[i % CATEGORICAL_COLORS.length],
 }));

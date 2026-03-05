@@ -12,7 +12,6 @@ interface PlateState {
   groupByColumn: string;
   hoveredConditionId: string | null;
   page: number;
-  filter: string;
 }
 
 type PlateAction =
@@ -28,8 +27,7 @@ type PlateAction =
   | { type: 'SET_GROUP_BY_COLUMN'; payload: string }
   | { type: 'SET_HOVERED_CONDITION'; payload: string | null }
   | { type: 'REMOVE_CONDITION'; payload: string }
-  | { type: 'SET_PAGE'; payload: number }
-  | { type: 'SET_FILTER'; payload: string };
+  | { type: 'SET_PAGE'; payload: number };
 
 const initialState: PlateState = {
   plateFormat: '96',
@@ -37,10 +35,9 @@ const initialState: PlateState = {
   wellMap: {},
   manualMode: false,
   viewMode: 'unique',
-  groupByColumn: 'factor1',
+  groupByColumn: 'load_challenge',
   hoveredConditionId: null,
   page: 0,
-  filter: '',
 };
 
 function plateReducer(state: PlateState, action: PlateAction): PlateState {
@@ -135,9 +132,6 @@ function plateReducer(state: PlateState, action: PlateAction): PlateState {
 
     case 'SET_PAGE':
       return { ...state, page: action.payload };
-
-    case 'SET_FILTER':
-      return { ...state, filter: action.payload, page: 0 };
 
     default:
       return state;

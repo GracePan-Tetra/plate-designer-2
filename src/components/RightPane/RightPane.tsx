@@ -27,7 +27,7 @@ export default function RightPane({
   return (
     <Box
       sx={{
-        width: 280,
+        width: '20%',
         flexShrink: 0,
         borderLeft: '1px solid #E5E7EB',
         display: 'flex',

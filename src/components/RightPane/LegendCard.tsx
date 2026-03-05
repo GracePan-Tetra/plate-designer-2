@@ -29,34 +29,14 @@ export default function LegendCard({ condition, onRemove, onHoverEnter, onHoverL
         cursor: 'default',
       }}
     >
-      {/* Color swatch */}
-      <Box
-        sx={{
-          width: 16,
-          height: 16,
-          borderRadius: '4px',
-          bgcolor: condition.color,
-          flexShrink: 0,
-          mt: 0.25,
-        }}
-      />
+      <Box sx={{ width: 16, height: 16, borderRadius: '4px', bgcolor: condition.color, flexShrink: 0, mt: 0.25 }} />
 
-      {/* Info */}
       <Box sx={{ flex: 1, minWidth: 0 }}>
-        <Typography
-          variant="caption"
-          sx={{ fontWeight: 600, display: 'block', lineHeight: 1.3 }}
-          noWrap
-        >
+        <Typography variant="caption" sx={{ fontWeight: 600, display: 'block', lineHeight: 1.3 }} noWrap>
           {condition.id}
         </Typography>
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          sx={{ fontSize: '0.65rem', display: 'block', lineHeight: 1.3 }}
-          noWrap
-        >
-          {condition.factor1} | {condition.factor2} | {condition.factor3}
+        <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem', display: 'block', lineHeight: 1.3 }} noWrap>
+          {condition.load_challenge} | {condition.resin_name} | {condition.starting_material}
         </Typography>
       </Box>
 

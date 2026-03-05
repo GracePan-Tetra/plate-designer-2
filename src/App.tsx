@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
@@ -11,6 +12,7 @@ import { ViewMode } from './types';
 
 export default function App() {
   const { state, dispatch } = usePlateState();
+  const [leftPaneExpanded, setLeftPaneExpanded] = useState(false);
 
   const selectedConditions = state.selectedConditionIds
     .map((id) => mockConditions.find((c) => c.id === id))
@@ -19,26 +21,12 @@ export default function App() {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
       {/* Header */}
-      <Box
-        sx={{
-          px: 3,
-          py: 1.5,
-          borderBottom: '1px solid #E5E7EB',
-          bgcolor: 'background.paper',
-          flexShrink: 0,
-        }}
-      >
+      <Box sx={{ px: 3, py: 1.5, borderBottom: '1px solid #E5E7EB', bgcolor: 'background.paper', flexShrink: 0 }}>
         <Breadcrumbs separator="/" sx={{ mb: 0.5 }}>
-          <Link underline="hover" color="inherit" href="#" sx={{ fontSize: '0.8rem' }}>
-            Project X
-          </Link>
-          <Link underline="hover" color="inherit" href="#" sx={{ fontSize: '0.8rem' }}>
-            All Experiments
-          </Link>
+          <Link underline="hover" color="inherit" href="#" sx={{ fontSize: '0.8rem' }}>Project X</Link>
+          <Link underline="hover" color="inherit" href="#" sx={{ fontSize: '0.8rem' }}>All Experiments</Link>
         </Breadcrumbs>
-        <Typography variant="h6" sx={{ fontWeight: 600, lineHeight: 1.3 }}>
-          Experiment Name
-        </Typography>
+        <Typography variant="h6" sx={{ fontWeight: 600, lineHeight: 1.3 }}>Experiment Name</Typography>
       </Box>
 
       {/* 3-panel layout */}
@@ -47,14 +35,14 @@ export default function App() {
           plateFormat={state.plateFormat}
           conditions={mockConditions}
           selectedIds={state.selectedConditionIds}
-          filter={state.filter}
           page={state.page}
+          isExpanded={leftPaneExpanded}
           onFormatChange={(format) => dispatch({ type: 'SET_PLATE_FORMAT', payload: format })}
           onToggleSelect={(id) => dispatch({ type: 'TOGGLE_CONDITION_SELECTION', payload: id })}
           onSelectAll={() => dispatch({ type: 'SELECT_ALL_CONDITIONS' })}
           onDeselectAll={() => dispatch({ type: 'DESELECT_ALL_CONDITIONS' })}
-          onFilterChange={(val) => dispatch({ type: 'SET_FILTER', payload: val })}
           onPageChange={(page) => dispatch({ type: 'SET_PAGE', payload: page })}
+          onToggleExpand={() => setLeftPaneExpanded((v) => !v)}
         />
 
         <CenterPane
