@@ -10,6 +10,7 @@ interface Props {
   hoveredConditionId: string | null;
   manualMode: boolean;
   hasSelectedConditions: boolean;
+  getDisplayColor?: (conditionId: string) => string;
   onPaintWell: (wellKey: string) => void;
 }
 
@@ -25,6 +26,7 @@ export default function PlateCanvas({
   hoveredConditionId,
   manualMode,
   hasSelectedConditions,
+  getDisplayColor,
   onPaintWell,
 }: Props) {
   const { rows, cols, rowLabels } = PLATE_GEOMETRIES[format];
@@ -106,6 +108,10 @@ export default function PlateCanvas({
                   hoveredConditionId !== null &&
                   assignment?.conditionId === hoveredConditionId;
 
+                const displayColor = assignment && getDisplayColor
+                  ? getDisplayColor(assignment.conditionId)
+                  : undefined;
+
                 return (
                   <Box key={wellKey} sx={{ mx: `${gap / 2}px`, flexShrink: 0 }}>
                     <WellCircle
@@ -114,6 +120,7 @@ export default function PlateCanvas({
                       format={format}
                       isHighlighted={isHighlighted}
                       manualMode={manualMode}
+                      displayColor={displayColor}
                       onClick={() => onPaintWell(wellKey)}
                     />
                   </Box>

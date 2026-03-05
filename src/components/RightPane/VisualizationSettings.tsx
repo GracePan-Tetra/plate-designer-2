@@ -4,7 +4,9 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
+import LayersIcon from '@mui/icons-material/Layers';
 import { ViewMode } from '../../types';
+import { GROUPABLE_COLUMNS } from '../../data/conditionColumns';
 
 interface Props {
   viewMode: ViewMode;
@@ -12,12 +14,6 @@ interface Props {
   onViewModeChange: (mode: ViewMode) => void;
   onGroupByColumnChange: (col: string) => void;
 }
-
-const FACTOR_COLUMNS = [
-  { value: 'load_challenge', label: 'load_challenge' },
-  { value: 'resin_name', label: 'resin_name' },
-  { value: 'starting_material', label: 'starting material' },
-];
 
 export default function VisualizationSettings({
   viewMode,
@@ -27,15 +23,21 @@ export default function VisualizationSettings({
 }: Props) {
   return (
     <Box sx={{ mb: 2 }}>
-      <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-        Visualization Mode
+      {/* Section header */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1.5 }}>
+        <LayersIcon sx={{ fontSize: '0.95rem', color: 'text.secondary' }} />
+        <Typography variant="caption" sx={{ fontWeight: 700, letterSpacing: '0.08em', color: 'text.secondary', textTransform: 'uppercase' }}>
+          Visualization
+        </Typography>
+      </Box>
+
+      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.75 }}>
+        Visualization View Mode
       </Typography>
 
       <FormControl fullWidth size="small" sx={{ mb: 1.5 }}>
-        <InputLabel>Group By</InputLabel>
         <Select
           value={viewMode}
-          label="Group By"
           onChange={(e: SelectChangeEvent) => onViewModeChange(e.target.value as ViewMode)}
         >
           <MenuItem value="unique">Group by Unique Conditions</MenuItem>
@@ -44,28 +46,25 @@ export default function VisualizationSettings({
       </FormControl>
 
       {viewMode === 'column' && (
-        <>
-          <FormControl fullWidth size="small" sx={{ mb: 1.5 }}>
-            <InputLabel>Factor Column</InputLabel>
+        <Box sx={{ pl: 1.5, borderLeft: '2px solid #E5E7EB' }}>
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.75 }}>
+            Column
+          </Typography>
+          <FormControl fullWidth size="small">
+            <InputLabel>Select column</InputLabel>
             <Select
               value={groupByColumn}
-              label="Factor Column"
+              label="Select column"
               onChange={(e: SelectChangeEvent) => onGroupByColumnChange(e.target.value)}
             >
-              {FACTOR_COLUMNS.map((col) => (
-                <MenuItem key={col.value} value={col.value}>{col.label}</MenuItem>
+              {GROUPABLE_COLUMNS.map((col) => (
+                <MenuItem key={col.field} value={col.field}>
+                  {col.headerName}
+                </MenuItem>
               ))}
             </Select>
           </FormControl>
-
-          <Box>
-            <Box sx={{ height: 12, borderRadius: 1, background: 'linear-gradient(to right, #DBEAFE, #1D4ED8)', mb: 0.5 }} />
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Typography variant="caption" color="text.secondary">Low</Typography>
-              <Typography variant="caption" color="text.secondary">High</Typography>
-            </Box>
-          </Box>
-        </>
+        </Box>
       )}
     </Box>
   );

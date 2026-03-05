@@ -13,6 +13,7 @@ interface Props {
   format: PlateFormat;
   isHighlighted: boolean;
   manualMode: boolean;
+  displayColor?: string; // overrides assignment.color when provided
   onClick: () => void;
 }
 
@@ -21,12 +22,14 @@ export default function WellCircle({
   format,
   isHighlighted,
   manualMode,
+  displayColor,
   onClick,
 }: Props) {
   const size = WELL_SIZES[format];
+  const color = displayColor ?? assignment?.color;
 
-  const boxShadow = isHighlighted && assignment
-    ? `0 0 0 3px white, 0 0 0 5px ${assignment.color}`
+  const boxShadow = isHighlighted && color
+    ? `0 0 0 3px white, 0 0 0 5px ${color}`
     : undefined;
 
   return (
@@ -36,11 +39,11 @@ export default function WellCircle({
         width: size,
         height: size,
         borderRadius: '50%',
-        backgroundColor: assignment ? assignment.color : 'transparent',
-        border: assignment ? 'none' : '2px solid #E5E7EB',
+        backgroundColor: color ?? 'transparent',
+        border: color ? 'none' : '2px solid #E5E7EB',
         boxShadow,
         cursor: manualMode ? 'pointer' : 'default',
-        transition: 'box-shadow 0.15s ease',
+        transition: 'box-shadow 0.15s ease, background-color 0.2s ease',
         flexShrink: 0,
       }}
     />

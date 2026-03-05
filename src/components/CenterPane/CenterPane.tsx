@@ -10,6 +10,7 @@ interface Props {
   manualMode: boolean;
   hoveredConditionId: string | null;
   hasSelectedConditions: boolean;
+  getDisplayColor?: (conditionId: string) => string;
   onAutoFill: () => void;
   onToggleManualMode: () => void;
   onClear: () => void;
@@ -22,6 +23,7 @@ export default function CenterPane({
   manualMode,
   hoveredConditionId,
   hasSelectedConditions,
+  getDisplayColor,
   onAutoFill,
   onToggleManualMode,
   onClear,
@@ -58,6 +60,7 @@ export default function CenterPane({
           hoveredConditionId={hoveredConditionId}
           manualMode={manualMode}
           hasSelectedConditions={hasSelectedConditions}
+          getDisplayColor={getDisplayColor}
           onPaintWell={onPaintWell}
         />
       </Box>
