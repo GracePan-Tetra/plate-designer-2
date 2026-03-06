@@ -346,7 +346,7 @@ export default function ConditionsTable({
       </Popover>
 
       <TableContainer>
-        <Table size="small" stickyHeader>
+        <Table size="small">
           <TableHead>
             <TableRow>
               <TableCell padding="checkbox">
