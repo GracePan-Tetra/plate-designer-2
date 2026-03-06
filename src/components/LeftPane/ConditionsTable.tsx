@@ -142,7 +142,14 @@ export default function ConditionsTable({
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Header row */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
-        <Typography variant="subtitle1" fontWeight={700}>Select Conditions</Typography>
+        <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.75 }}>
+          <Typography variant="caption" sx={{ fontWeight: 700, letterSpacing: '0.08em', color: 'text.secondary', textTransform: 'uppercase' }}>
+            Select Conditions
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            ({selectedIds.length} / {conditions.length})
+          </Typography>
+        </Box>
         <Box sx={{ ml: 'auto', display: 'flex', gap: 0.5, alignItems: 'center' }}>
           <Button
             size="small"
@@ -322,6 +329,7 @@ export default function ConditionsTable({
           rowsPerPage={ROWS_PER_PAGE}
           rowsPerPageOptions={[ROWS_PER_PAGE]}
           onPageChange={(_, newPage) => onPageChange(newPage)}
+          labelDisplayedRows={({ from, to, count }) => `${from}–${to} of ${count}`}
           sx={{ borderTop: '1px solid #E5E7EB', flexShrink: 0 }}
         />
       )}

@@ -15,48 +15,36 @@ import { ViewMode } from './types';
 export default function App() {
   const { state, dispatch } = usePlateState();
   const [leftPaneExpanded, setLeftPaneExpanded] = useState(false);
+  const [leftPaneCollapsed, setLeftPaneCollapsed] = useState(false);
 
   const selectedConditions = state.selectedConditionIds
     .map((id) => mockConditions.find((c) => c.id === id))
     .filter((c): c is NonNullable<typeof c> => c !== undefined);
 
-  // Compute dynamic well display colors based on visualization mode
+  // Dynamic well colors based on visualization mode
   const getDisplayColor = useMemo(() => {
     if (state.viewMode !== 'column' || !state.groupByColumn) return undefined;
-
     const colDef = GROUPABLE_COLUMNS.find((c) => c.field === state.groupByColumn);
     if (!colDef) return undefined;
-
     const field = state.groupByColumn;
 
     if (colDef.type === 'number') {
-      const allValues = mockConditions.map(
-        (c) => (c as unknown as Record<string, number>)[field]
-      );
+      const allValues = mockConditions.map((c) => (c as unknown as Record<string, number>)[field]);
       const nonZero = allValues.filter((v) => v > 0);
       const min = nonZero.length ? Math.min(...nonZero) : 0;
       const max = nonZero.length ? Math.max(...nonZero) : 0;
-
       return (conditionId: string) => {
         const condition = mockConditions.find((c) => c.id === conditionId);
         if (!condition) return '#E5E7EB';
-        const value = (condition as unknown as Record<string, number>)[field];
-        return getGradientColor(value, min, max);
+        return getGradientColor((condition as unknown as Record<string, number>)[field], min, max);
       };
     } else {
-      // Categorical
-      const distinctValues = [
-        ...new Set(
-          mockConditions.map((c) => String((c as unknown as Record<string, unknown>)[field]))
-        ),
-      ].sort();
-
+      const distinctValues = [...new Set(mockConditions.map((c) => String((c as unknown as Record<string, unknown>)[field])))].sort();
       return (conditionId: string) => {
         const condition = mockConditions.find((c) => c.id === conditionId);
         if (!condition) return '#E5E7EB';
-        const value = String((condition as unknown as Record<string, unknown>)[field]);
-        const idx = distinctValues.indexOf(value);
-        return CATEGORICAL_COLORS[idx % CATEGORICAL_COLORS.length];
+        const val = String((condition as unknown as Record<string, unknown>)[field]);
+        return CATEGORICAL_COLORS[distinctValues.indexOf(val) % CATEGORICAL_COLORS.length];
       };
     }
   }, [state.viewMode, state.groupByColumn]);
@@ -80,23 +68,29 @@ export default function App() {
           selectedIds={state.selectedConditionIds}
           page={state.page}
           isExpanded={leftPaneExpanded}
+          isCollapsed={leftPaneCollapsed}
+          fillStrategy={state.fillStrategy}
+          startWell={state.startWell}
+          replicates={state.replicates}
           onFormatChange={(format) => dispatch({ type: 'SET_PLATE_FORMAT', payload: format })}
           onToggleSelect={(id) => dispatch({ type: 'TOGGLE_CONDITION_SELECTION', payload: id })}
           onSelectAll={() => dispatch({ type: 'SELECT_ALL_CONDITIONS' })}
           onDeselectAll={() => dispatch({ type: 'DESELECT_ALL_CONDITIONS' })}
           onPageChange={(page) => dispatch({ type: 'SET_PAGE', payload: page })}
           onToggleExpand={() => setLeftPaneExpanded((v) => !v)}
+          onToggleCollapse={() => { setLeftPaneCollapsed((v) => !v); setLeftPaneExpanded(false); }}
+          onFillStrategyChange={(val) => dispatch({ type: 'SET_FILL_STRATEGY', payload: val })}
+          onStartWellChange={(val) => dispatch({ type: 'SET_START_WELL', payload: val })}
+          onReplicatesChange={(val) => dispatch({ type: 'SET_REPLICATES', payload: val })}
+          onApplyMapping={() => dispatch({ type: 'APPLY_MAPPING' })}
         />
 
         <CenterPane
           plateFormat={state.plateFormat}
           wellMap={state.wellMap}
-          manualMode={state.manualMode}
           hoveredConditionId={state.hoveredConditionId}
           hasSelectedConditions={state.selectedConditionIds.length > 0}
           getDisplayColor={getDisplayColor}
-          onAutoFill={() => dispatch({ type: 'AUTO_FILL' })}
-          onToggleManualMode={() => dispatch({ type: 'TOGGLE_MANUAL_MODE' })}
           onClear={() => dispatch({ type: 'CLEAR_WELLS' })}
           onPaintWell={(wellKey) => dispatch({ type: 'PAINT_WELL', payload: wellKey })}
         />

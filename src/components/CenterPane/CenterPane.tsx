@@ -7,12 +7,9 @@ import PlateCanvas from './PlateCanvas';
 interface Props {
   plateFormat: PlateFormat;
   wellMap: WellMap;
-  manualMode: boolean;
   hoveredConditionId: string | null;
   hasSelectedConditions: boolean;
   getDisplayColor?: (conditionId: string) => string;
-  onAutoFill: () => void;
-  onToggleManualMode: () => void;
   onClear: () => void;
   onPaintWell: (wellKey: string) => void;
 }
@@ -20,12 +17,9 @@ interface Props {
 export default function CenterPane({
   plateFormat,
   wellMap,
-  manualMode,
   hoveredConditionId,
   hasSelectedConditions,
   getDisplayColor,
-  onAutoFill,
-  onToggleManualMode,
   onClear,
   onPaintWell,
 }: Props) {
@@ -44,12 +38,8 @@ export default function CenterPane({
       }}
     >
       <PlateToolbar
-        manualMode={manualMode}
         assignedCount={assignedCount}
         totalWells={geometry.totalWells}
-        hasSelectedConditions={hasSelectedConditions}
-        onAutoFill={onAutoFill}
-        onToggleManualMode={onToggleManualMode}
         onClear={onClear}
       />
 
@@ -58,7 +48,7 @@ export default function CenterPane({
           format={plateFormat}
           wellMap={wellMap}
           hoveredConditionId={hoveredConditionId}
-          manualMode={manualMode}
+          manualMode={hasSelectedConditions}
           hasSelectedConditions={hasSelectedConditions}
           getDisplayColor={getDisplayColor}
           onPaintWell={onPaintWell}

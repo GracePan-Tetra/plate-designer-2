@@ -1,17 +1,20 @@
 import { useReducer } from 'react';
 import { PlateFormat, WellMap, ViewMode, WellKey } from '../types';
 import { mockConditions } from '../data/mockConditions';
-import { autoFill } from '../utils/serpentine';
+import { autoFill, uiToWellKey } from '../utils/serpentine';
 
 interface PlateState {
   plateFormat: PlateFormat;
   selectedConditionIds: string[];
   wellMap: WellMap;
-  manualMode: boolean;
   viewMode: ViewMode;
   groupByColumn: string;
   hoveredConditionId: string | null;
   page: number;
+  // Mapping settings
+  fillStrategy: 'snake';
+  startWell: string;   // UI format e.g. "A1"
+  replicates: number;
 }
 
 type PlateAction =
@@ -19,31 +22,35 @@ type PlateAction =
   | { type: 'TOGGLE_CONDITION_SELECTION'; payload: string }
   | { type: 'SELECT_ALL_CONDITIONS' }
   | { type: 'DESELECT_ALL_CONDITIONS' }
-  | { type: 'TOGGLE_MANUAL_MODE' }
   | { type: 'PAINT_WELL'; payload: WellKey }
-  | { type: 'AUTO_FILL' }
+  | { type: 'APPLY_MAPPING' }
   | { type: 'CLEAR_WELLS' }
   | { type: 'SET_VIEW_MODE'; payload: ViewMode }
   | { type: 'SET_GROUP_BY_COLUMN'; payload: string }
   | { type: 'SET_HOVERED_CONDITION'; payload: string | null }
   | { type: 'REMOVE_CONDITION'; payload: string }
-  | { type: 'SET_PAGE'; payload: number };
+  | { type: 'SET_PAGE'; payload: number }
+  | { type: 'SET_FILL_STRATEGY'; payload: 'snake' }
+  | { type: 'SET_START_WELL'; payload: string }
+  | { type: 'SET_REPLICATES'; payload: number };
 
 const initialState: PlateState = {
   plateFormat: '96',
   selectedConditionIds: [],
   wellMap: {},
-  manualMode: false,
   viewMode: 'unique',
   groupByColumn: 'load_challenge',
   hoveredConditionId: null,
   page: 0,
+  fillStrategy: 'snake',
+  startWell: 'A1',
+  replicates: 3,
 };
 
 function plateReducer(state: PlateState, action: PlateAction): PlateState {
   switch (action.type) {
     case 'SET_PLATE_FORMAT':
-      return { ...state, plateFormat: action.payload, wellMap: {} };
+      return { ...state, plateFormat: action.payload, wellMap: {}, startWell: 'A1' };
 
     case 'TOGGLE_CONDITION_SELECTION': {
       const id = action.payload;
@@ -57,26 +64,18 @@ function plateReducer(state: PlateState, action: PlateAction): PlateState {
     }
 
     case 'SELECT_ALL_CONDITIONS':
-      return {
-        ...state,
-        selectedConditionIds: mockConditions.map((c) => c.id),
-      };
+      return { ...state, selectedConditionIds: mockConditions.map((c) => c.id) };
 
     case 'DESELECT_ALL_CONDITIONS':
       return { ...state, selectedConditionIds: [] };
 
-    case 'TOGGLE_MANUAL_MODE':
-      return { ...state, manualMode: !state.manualMode };
-
     case 'PAINT_WELL': {
-      if (!state.manualMode) return state;
       const wellKey = action.payload;
       const firstSelectedId = state.selectedConditionIds[0];
       if (!firstSelectedId) return state;
 
       const existing = state.wellMap[wellKey];
       if (existing && existing.conditionId === firstSelectedId) {
-        // Toggle off
         const newMap = { ...state.wellMap };
         delete newMap[wellKey];
         return { ...state, wellMap: newMap };
@@ -87,21 +86,23 @@ function plateReducer(state: PlateState, action: PlateAction): PlateState {
 
       return {
         ...state,
-        wellMap: {
-          ...state.wellMap,
-          [wellKey]: { conditionId: firstSelectedId, color: condition.color },
-        },
+        wellMap: { ...state.wellMap, [wellKey]: { conditionId: firstSelectedId, color: condition.color } },
       };
     }
 
-    case 'AUTO_FILL': {
+    case 'APPLY_MAPPING': {
       const selectedConditions = state.selectedConditionIds
         .map((id) => mockConditions.find((c) => c.id === id))
         .filter((c): c is NonNullable<typeof c> => c !== undefined);
 
       return {
         ...state,
-        wellMap: autoFill(state.plateFormat, selectedConditions),
+        wellMap: autoFill(
+          state.plateFormat,
+          selectedConditions,
+          uiToWellKey(state.startWell),
+          state.replicates,
+        ),
       };
     }
 
@@ -132,6 +133,15 @@ function plateReducer(state: PlateState, action: PlateAction): PlateState {
 
     case 'SET_PAGE':
       return { ...state, page: action.payload };
+
+    case 'SET_FILL_STRATEGY':
+      return { ...state, fillStrategy: action.payload };
+
+    case 'SET_START_WELL':
+      return { ...state, startWell: action.payload };
+
+    case 'SET_REPLICATES':
+      return { ...state, replicates: action.payload };
 
     default:
       return state;
