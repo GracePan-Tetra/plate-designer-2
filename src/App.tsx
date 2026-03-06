@@ -90,6 +90,7 @@ export default function App() {
           wellMap={state.wellMap}
           hoveredConditionId={state.hoveredConditionId}
           hasSelectedConditions={state.selectedConditionIds.length > 0}
+          isLeftCollapsed={leftPaneCollapsed}
           getDisplayColor={getDisplayColor}
           onClear={() => dispatch({ type: 'CLEAR_WELLS' })}
           onPaintWell={(wellKey) => dispatch({ type: 'PAINT_WELL', payload: wellKey })}
@@ -99,6 +100,7 @@ export default function App() {
           selectedConditions={selectedConditions}
           viewMode={state.viewMode}
           groupByColumn={state.groupByColumn}
+          isLeftCollapsed={leftPaneCollapsed}
           onViewModeChange={(mode: ViewMode) => dispatch({ type: 'SET_VIEW_MODE', payload: mode })}
           onGroupByColumnChange={(col) => dispatch({ type: 'SET_GROUP_BY_COLUMN', payload: col })}
           onRemoveCondition={(id) => dispatch({ type: 'REMOVE_CONDITION', payload: id })}

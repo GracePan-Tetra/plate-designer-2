@@ -15,6 +15,7 @@ interface Props {
   selectedConditions: Condition[];
   viewMode: ViewMode;
   groupByColumn: string;
+  isLeftCollapsed: boolean;
   onViewModeChange: (mode: ViewMode) => void;
   onGroupByColumnChange: (col: string) => void;
   onRemoveCondition: (id: string) => void;
@@ -120,6 +121,7 @@ export default function RightPane({
   selectedConditions,
   viewMode,
   groupByColumn,
+  isLeftCollapsed,
   onViewModeChange,
   onGroupByColumnChange,
   onRemoveCondition,
@@ -128,11 +130,10 @@ export default function RightPane({
   const activeColumn = GROUPABLE_COLUMNS.find((c) => c.field === groupByColumn);
   const isColumnMode = viewMode === 'column' && !!activeColumn;
   const isNumerical = activeColumn?.type === 'number';
-
   return (
     <Box
       sx={{
-        width: '20%',
+        ...(isLeftCollapsed ? { flex: 1 } : { width: '20%' }),
         flexShrink: 0,
         borderLeft: '1px solid #E5E7EB',
         display: 'flex',

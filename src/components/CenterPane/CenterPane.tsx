@@ -9,6 +9,7 @@ interface Props {
   wellMap: WellMap;
   hoveredConditionId: string | null;
   hasSelectedConditions: boolean;
+  isLeftCollapsed: boolean;
   getDisplayColor?: (conditionId: string) => string;
   onClear: () => void;
   onPaintWell: (wellKey: string) => void;
@@ -19,18 +20,17 @@ export default function CenterPane({
   wellMap,
   hoveredConditionId,
   hasSelectedConditions,
+  isLeftCollapsed,
   getDisplayColor,
   onClear,
   onPaintWell,
 }: Props) {
   const geometry = PLATE_GEOMETRIES[plateFormat];
   const assignedCount = Object.keys(wellMap).length;
-
   return (
     <Box
       sx={{
-        flex: '0 0 40%',
-        width: '40%',
+        ...(isLeftCollapsed ? { flex: 1 } : { flex: '0 0 40%', width: '40%' }),
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
