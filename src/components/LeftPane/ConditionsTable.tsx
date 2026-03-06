@@ -1,4 +1,5 @@
 import { Fragment, useMemo, useState } from 'react';
+import { useDraggable } from '@dnd-kit/core';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
@@ -48,6 +49,48 @@ interface Props {
   onDeselectAll: () => void;
   onPageChange: (page: number) => void;
   onToggleExpand: () => void;
+}
+
+function DraggableConditionRow({
+  condition,
+  isSelected,
+  isActive,
+  onToggleSelect,
+}: {
+  condition: Condition;
+  isSelected: boolean;
+  isActive: boolean;
+  onToggleSelect: (id: string) => void;
+}) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: `condition-${condition.id}`,
+    data: { conditionId: condition.id },
+  });
+
+  return (
+    <TableRow
+      ref={setNodeRef}
+      selected={isSelected}
+      onClick={() => onToggleSelect(condition.id)}
+      sx={{
+        cursor: 'grab',
+        opacity: isDragging ? 0.4 : 1,
+        outline: isActive ? `2px solid ${condition.color}` : 'none',
+        outlineOffset: '-2px',
+        '&:active': { cursor: 'grabbing' },
+      }}
+      {...listeners}
+      {...attributes}
+    >
+      <TableCell padding="checkbox" onClick={(e) => e.stopPropagation()}>
+        <Checkbox size="small" checked={isSelected} onChange={() => onToggleSelect(condition.id)} />
+      </TableCell>
+      <TableCell sx={{ fontSize: '0.78rem', fontWeight: isActive ? 700 : 400 }}>{condition.id}</TableCell>
+      <TableCell sx={{ fontSize: '0.78rem' }}>{condition.load_challenge}</TableCell>
+      <TableCell sx={{ fontSize: '0.78rem' }}>{condition.resin_name}</TableCell>
+      <TableCell sx={{ fontSize: '0.78rem' }}>{condition.starting_material}</TableCell>
+    </TableRow>
+  );
 }
 
 function groupRows(data: Condition[], field: string): Map<string, Condition[]> {
@@ -221,30 +264,15 @@ export default function ConditionsTable({
     });
   };
 
-  const renderRow = (condition: Condition) => {
-    const isSelected = selectedIds.includes(condition.id);
-    const isActive = condition.id === activeConditionId;
-    return (
-      <TableRow
-        key={condition.id}
-        selected={isSelected}
-        onClick={() => onToggleSelect(condition.id)}
-        sx={{
-          cursor: 'pointer',
-          outline: isActive ? `2px solid ${condition.color}` : 'none',
-          outlineOffset: '-2px',
-        }}
-      >
-        <TableCell padding="checkbox">
-          <Checkbox size="small" checked={isSelected} onChange={() => {}} />
-        </TableCell>
-        <TableCell sx={{ fontSize: '0.78rem', fontWeight: isActive ? 700 : 400 }}>{condition.id}</TableCell>
-        <TableCell sx={{ fontSize: '0.78rem' }}>{condition.load_challenge}</TableCell>
-        <TableCell sx={{ fontSize: '0.78rem' }}>{condition.resin_name}</TableCell>
-        <TableCell sx={{ fontSize: '0.78rem' }}>{condition.starting_material}</TableCell>
-      </TableRow>
-    );
-  };
+  const renderRow = (condition: Condition) => (
+    <DraggableConditionRow
+      key={condition.id}
+      condition={condition}
+      isSelected={selectedIds.includes(condition.id)}
+      isActive={condition.id === activeConditionId}
+      onToggleSelect={onToggleSelect}
+    />
+  );
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>

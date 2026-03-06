@@ -3,8 +3,11 @@ import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
+import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 import { usePlateState } from './hooks/usePlateState';
 import { mockConditions, CATEGORICAL_COLORS } from './data/mockConditions';
+import { closestCenter } from '@dnd-kit/core';
 import { GROUPABLE_COLUMNS } from './data/conditionColumns';
 import { getGradientColor } from './utils/colorUtils';
 import LeftPane from './components/LeftPane/LeftPane';
@@ -12,10 +15,41 @@ import CenterPane from './components/CenterPane/CenterPane';
 import RightPane from './components/RightPane/RightPane';
 import { ViewMode } from './types';
 
+function DragConditionChip({ conditionId }: { conditionId: string }) {
+  const condition = mockConditions.find((c) => c.id === conditionId);
+  return (
+    <Box sx={{
+      display: 'inline-flex', alignItems: 'center', gap: 1,
+      px: 1.5, py: 0.75, bgcolor: 'background.paper',
+      border: '1px solid #E5E7EB', borderRadius: 1,
+      boxShadow: '0 4px 16px rgba(0,0,0,0.18)',
+      userSelect: 'none', pointerEvents: 'none',
+    }}>
+      <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: condition?.color ?? '#E5E7EB', flexShrink: 0 }} />
+      <Typography variant="caption" fontWeight={600}>{conditionId}</Typography>
+    </Box>
+  );
+}
+
 export default function App() {
   const { state, dispatch } = usePlateState();
   const [leftPaneExpanded, setLeftPaneExpanded] = useState(false);
   const [leftPaneCollapsed, setLeftPaneCollapsed] = useState(false);
+  const [activeDragConditionId, setActiveDragConditionId] = useState<string | null>(null);
+
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveDragConditionId(event.active.data.current?.conditionId ?? null);
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.data.current?.conditionId) {
+      dispatch({ type: 'ASSIGN_CONDITION_TO_WELL', payload: { wellKey: over.id as string, conditionId: active.data.current.conditionId } });
+    }
+    setActiveDragConditionId(null);
+  };
 
   const selectedConditions = state.selectedConditionIds
     .map((id) => mockConditions.find((c) => c.id === id))
@@ -61,6 +95,7 @@ export default function App() {
       </Box>
 
       {/* 3-panel layout */}
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         <LeftPane
           plateFormat={state.plateFormat}
@@ -107,6 +142,10 @@ export default function App() {
           onHoverCondition={(id) => dispatch({ type: 'SET_HOVERED_CONDITION', payload: id })}
         />
       </Box>
+      <DragOverlay dropAnimation={null}>
+        {activeDragConditionId && <DragConditionChip conditionId={activeDragConditionId} />}
+      </DragOverlay>
+      </DndContext>
     </Box>
   );
 }

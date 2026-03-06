@@ -23,6 +23,7 @@ type PlateAction =
   | { type: 'SELECT_ALL_CONDITIONS' }
   | { type: 'DESELECT_ALL_CONDITIONS' }
   | { type: 'PAINT_WELL'; payload: WellKey }
+  | { type: 'ASSIGN_CONDITION_TO_WELL'; payload: { wellKey: string; conditionId: string } }
   | { type: 'APPLY_MAPPING' }
   | { type: 'CLEAR_WELLS' }
   | { type: 'SET_VIEW_MODE'; payload: ViewMode }
@@ -104,6 +105,13 @@ function plateReducer(state: PlateState, action: PlateAction): PlateState {
           state.replicates,
         ),
       };
+    }
+
+    case 'ASSIGN_CONDITION_TO_WELL': {
+      const { wellKey, conditionId } = action.payload;
+      const condition = mockConditions.find((c) => c.id === conditionId);
+      if (!condition) return state;
+      return { ...state, wellMap: { ...state.wellMap, [wellKey]: { conditionId, color: condition.color } } };
     }
 
     case 'CLEAR_WELLS':
