@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
@@ -51,12 +50,12 @@ export default function VisualizationSettings({
             Column
           </Typography>
           <FormControl fullWidth size="small">
-            <InputLabel>Select column</InputLabel>
             <Select
               value={groupByColumn}
-              label="Select column"
+              displayEmpty
               onChange={(e: SelectChangeEvent) => onGroupByColumnChange(e.target.value)}
             >
+              <MenuItem value="" disabled><em>Select column</em></MenuItem>
               {GROUPABLE_COLUMNS.map((col) => (
                 <MenuItem key={col.field} value={col.field}>
                   {col.headerName}

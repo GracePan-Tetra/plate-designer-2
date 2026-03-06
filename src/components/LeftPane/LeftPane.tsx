@@ -179,7 +179,6 @@ export default function LeftPane({
       <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
 
         {/* ── EXPERIMENT SCALE ── */}
-        <Divider />
         <SectionHeader label="Experiment Scale" open={scaleOpen} onToggle={() => setScaleOpen((v) => !v)} />
         <Collapse in={scaleOpen} timeout="auto">
           <Box sx={{ px: 2, pb: 2 }}>
