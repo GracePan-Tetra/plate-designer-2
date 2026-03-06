@@ -247,7 +247,7 @@ export default function ConditionsTable({
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
       {/* Filter / Group / Expand toolbar */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5, gap: 0.5 }}>
         <Button
@@ -345,7 +345,7 @@ export default function ConditionsTable({
         )}
       </Popover>
 
-      <TableContainer sx={{ flex: 1, overflow: 'auto' }}>
+      <TableContainer>
         <Table size="small" stickyHeader>
           <TableHead>
             <TableRow>

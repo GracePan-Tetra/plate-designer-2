@@ -198,8 +198,8 @@ export default function LeftPane({
           onToggle={() => setConditionsOpen((v) => !v)}
           badge={conditionsBadge}
         />
-        <Collapse in={conditionsOpen} timeout="auto" sx={{ flex: conditionsOpen ? 1 : 'none', minHeight: 0, display: 'flex', flexDirection: 'column' }}>
-          <Box sx={{ flex: 1, overflow: 'hidden', px: 2, pb: 1, display: 'flex', flexDirection: 'column', minHeight: 320 }}>
+        <Collapse in={conditionsOpen} timeout="auto">
+          <Box sx={{ px: 2, pb: 1 }}>
             <ConditionsTable
               conditions={conditions}
               selectedIds={selectedIds}
