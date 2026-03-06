@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
@@ -31,13 +30,6 @@ export default function MappingSettings({
 
   return (
     <Box>
-      <Typography
-        variant="caption"
-        sx={{ fontWeight: 700, letterSpacing: '0.08em', color: 'text.secondary', textTransform: 'uppercase', display: 'block', mb: 1.5 }}
-      >
-        Mapping Setting
-      </Typography>
-
       {/* Fill Strategy */}
       <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
         Fill Strategy
@@ -58,10 +50,8 @@ export default function MappingSettings({
             Start Well (eg.A1)
           </Typography>
           <FormControl fullWidth size="small">
-            <InputLabel>Well</InputLabel>
             <Select
               value={startWell}
-              label="Well"
               onChange={(e) => onStartWellChange(e.target.value)}
               MenuProps={{ PaperProps: { sx: { maxHeight: 240 } } }}
             >

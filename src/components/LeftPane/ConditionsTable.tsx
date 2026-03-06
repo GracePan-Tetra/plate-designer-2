@@ -4,21 +4,22 @@ import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
 import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
+import MenuItem from '@mui/material/MenuItem';
 import Popover from '@mui/material/Popover';
 import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import WorkspacesIcon from '@mui/icons-material/Workspaces';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Condition } from '../../types';
@@ -26,7 +27,7 @@ import { EMPTY_FILTER_STATE, type FilterState } from '../../utils/tableFilterTyp
 import { applyFilterState, countActiveConditions } from '../../utils/tableFilterUtils';
 import { ConditionFilterPanel } from './ConditionFilterPanel';
 
-const ROWS_PER_PAGE = 15;
+const PAGE_SIZE_OPTIONS = [10, 15, 25, 50];
 
 const COLUMNS = [
   { field: 'id', headerName: 'Condition ID', type: 'string' as const },
@@ -59,6 +60,112 @@ function groupRows(data: Condition[], field: string): Map<string, Condition[]> {
   return map;
 }
 
+// Custom pagination component
+function CustomPagination({
+  page,
+  totalCount,
+  pageSize,
+  onPageChange,
+  onPageSizeChange,
+}: {
+  page: number;
+  totalCount: number;
+  pageSize: number;
+  onPageChange: (p: number) => void;
+  onPageSizeChange: (size: number) => void;
+}) {
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+
+  // Build page number list: 1 2 3 ... N
+  const getPages = (): (number | '...')[] => {
+    if (totalPages <= 5) return Array.from({ length: totalPages }, (_, i) => i + 1);
+    if (page <= 2) return [1, 2, 3, '...', totalPages];
+    if (page >= totalPages - 2) return [1, '...', totalPages - 2, totalPages - 1, totalPages];
+    return [1, '...', page, page + 1, page + 2, '...', totalPages];
+  };
+
+  const pages = getPages();
+
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'center', px: 1, py: 0.75, borderTop: '1px solid #E5E7EB', flexShrink: 0 }}>
+      {/* Prev */}
+      <IconButton
+        size="small"
+        onClick={() => onPageChange(page - 1)}
+        disabled={page === 0}
+        sx={{ p: 0.5 }}
+      >
+        <ChevronLeftIcon sx={{ fontSize: '1rem' }} />
+      </IconButton>
+
+      {/* Page numbers */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }}>
+        {pages.map((p, i) =>
+          p === '...' ? (
+            <Typography key={`ellipsis-${i}`} variant="caption" sx={{ px: 0.5, color: 'text.secondary' }}>
+              ...
+            </Typography>
+          ) : (
+            <Box
+              key={p}
+              onClick={() => onPageChange((p as number) - 1)}
+              sx={{
+                minWidth: 28,
+                height: 28,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 1,
+                cursor: 'pointer',
+                fontSize: '0.78rem',
+                fontWeight: page === (p as number) - 1 ? 700 : 400,
+                bgcolor: page === (p as number) - 1 ? 'primary.main' : 'transparent',
+                color: page === (p as number) - 1 ? '#fff' : 'text.primary',
+                '&:hover': {
+                  bgcolor: page === (p as number) - 1 ? 'primary.dark' : 'action.hover',
+                },
+              }}
+            >
+              {p}
+            </Box>
+          )
+        )}
+      </Box>
+
+      {/* Next */}
+      <IconButton
+        size="small"
+        onClick={() => onPageChange(page + 1)}
+        disabled={page >= totalPages - 1}
+        sx={{ p: 0.5 }}
+      >
+        <ChevronRightIcon sx={{ fontSize: '1rem' }} />
+      </IconButton>
+
+      <Box sx={{ flex: 1 }} />
+
+      {/* Rows per page */}
+      <Select
+        size="small"
+        value={pageSize}
+        onChange={(e) => { onPageSizeChange(Number(e.target.value)); onPageChange(0); }}
+        sx={{
+          fontSize: '0.78rem',
+          height: 28,
+          '& .MuiSelect-select': { py: 0, px: 1 },
+          '& .MuiOutlinedInput-notchedOutline': { borderColor: '#E5E7EB' },
+        }}
+      >
+        {PAGE_SIZE_OPTIONS.map((s) => (
+          <MenuItem key={s} value={s} sx={{ fontSize: '0.78rem' }}>
+            {s} / page
+          </MenuItem>
+        ))}
+      </Select>
+    </Box>
+  );
+}
+
 export default function ConditionsTable({
   conditions,
   selectedIds,
@@ -75,6 +182,7 @@ export default function ConditionsTable({
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
   const [filterAnchorEl, setFilterAnchorEl] = useState<HTMLElement | null>(null);
   const [groupAnchorEl, setGroupAnchorEl] = useState<HTMLElement | null>(null);
+  const [pageSize, setPageSize] = useState(10);
 
   // Apply filter
   const filtered = useMemo(() => {
@@ -91,7 +199,7 @@ export default function ConditionsTable({
     return groupRows(filtered, groupByField);
   }, [filtered, groupByField]);
 
-  const paginated = grouped ? null : filtered.slice(page * ROWS_PER_PAGE, page * ROWS_PER_PAGE + ROWS_PER_PAGE);
+  const paginated = grouped ? null : filtered.slice(page * pageSize, page * pageSize + pageSize);
 
   const activeFilterCount = countActiveConditions(filterState);
   const activeConditionId = selectedIds[0];
@@ -140,58 +248,48 @@ export default function ConditionsTable({
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      {/* Header row */}
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
-        <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.75 }}>
-          <Typography variant="caption" sx={{ fontWeight: 700, letterSpacing: '0.08em', color: 'text.secondary', textTransform: 'uppercase' }}>
-            Select Conditions
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            ({selectedIds.length} / {conditions.length})
-          </Typography>
-        </Box>
-        <Box sx={{ ml: 'auto', display: 'flex', gap: 0.5, alignItems: 'center' }}>
-          <Button
-            size="small"
-            startIcon={<FilterListIcon sx={{ fontSize: '0.9rem !important' }} />}
-            onClick={(e) => setFilterAnchorEl(e.currentTarget)}
-            sx={{
-              color: activeFilterCount > 0 ? 'primary.main' : 'text.secondary',
-              fontWeight: activeFilterCount > 0 ? 600 : 400,
-              fontSize: '0.78rem',
-              minWidth: 0,
-              px: 1,
-            }}
-          >
-            Filter{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
-          </Button>
+      {/* Filter / Group / Expand toolbar */}
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5, gap: 0.5 }}>
+        <Button
+          size="small"
+          startIcon={<FilterListIcon sx={{ fontSize: '0.9rem !important' }} />}
+          onClick={(e) => setFilterAnchorEl(e.currentTarget)}
+          sx={{
+            color: activeFilterCount > 0 ? 'primary.main' : 'text.secondary',
+            fontWeight: activeFilterCount > 0 ? 600 : 400,
+            fontSize: '0.78rem',
+            minWidth: 0,
+            px: 1,
+          }}
+        >
+          Filter{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
+        </Button>
 
-          <Button
-            size="small"
-            startIcon={<WorkspacesIcon sx={{ fontSize: '0.9rem !important' }} />}
-            onClick={(e) => setGroupAnchorEl(e.currentTarget)}
-            sx={{
-              color: groupByField ? 'primary.main' : 'text.secondary',
-              fontWeight: groupByField ? 600 : 400,
-              fontSize: '0.78rem',
-              minWidth: 0,
-              px: 1,
-            }}
-          >
-            Group
-          </Button>
+        <Button
+          size="small"
+          startIcon={<WorkspacesIcon sx={{ fontSize: '0.9rem !important' }} />}
+          onClick={(e) => setGroupAnchorEl(e.currentTarget)}
+          sx={{
+            color: groupByField ? 'primary.main' : 'text.secondary',
+            fontWeight: groupByField ? 600 : 400,
+            fontSize: '0.78rem',
+            minWidth: 0,
+            px: 1,
+          }}
+        >
+          Group
+        </Button>
 
-          <Button
-            size="small"
-            startIcon={isExpanded
-              ? <CloseFullscreenIcon sx={{ fontSize: '0.9rem !important' }} />
-              : <OpenInFullIcon sx={{ fontSize: '0.9rem !important' }} />}
-            onClick={onToggleExpand}
-            sx={{ color: 'text.secondary', fontSize: '0.78rem', minWidth: 0, px: 1 }}
-          >
-            {isExpanded ? 'Collapse' : 'Expand'}
-          </Button>
-        </Box>
+        <Button
+          size="small"
+          startIcon={isExpanded
+            ? <CloseFullscreenIcon sx={{ fontSize: '0.9rem !important' }} />
+            : <OpenInFullIcon sx={{ fontSize: '0.9rem !important' }} />}
+          onClick={onToggleExpand}
+          sx={{ color: 'text.secondary', fontSize: '0.78rem', minWidth: 0, px: 1 }}
+        >
+          {isExpanded ? 'Collapse' : 'Expand'}
+        </Button>
       </Box>
 
       {/* Filter popover */}
@@ -322,15 +420,12 @@ export default function ConditionsTable({
       </TableContainer>
 
       {!grouped && (
-        <TablePagination
-          component="div"
-          count={filtered.length}
+        <CustomPagination
           page={page}
-          rowsPerPage={ROWS_PER_PAGE}
-          rowsPerPageOptions={[ROWS_PER_PAGE]}
-          onPageChange={(_, newPage) => onPageChange(newPage)}
-          labelDisplayedRows={({ from, to, count }) => `${from}–${to} of ${count}`}
-          sx={{ borderTop: '1px solid #E5E7EB', flexShrink: 0 }}
+          totalCount={filtered.length}
+          pageSize={pageSize}
+          onPageChange={onPageChange}
+          onPageSizeChange={setPageSize}
         />
       )}
     </Box>

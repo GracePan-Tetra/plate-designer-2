@@ -1,5 +1,4 @@
 import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import { PlateFormat } from '../../types';
@@ -15,9 +14,8 @@ export default function ExperimentScaleSelect({ value, onChange }: Props) {
   };
 
   return (
-    <FormControl size="small" sx={{ width: 300 }}>
-      <InputLabel>Experiment Scale</InputLabel>
-      <Select value={value} label="Experiment Scale" onChange={handleChange}>
+    <FormControl fullWidth size="small">
+      <Select value={value} onChange={handleChange}>
         <MenuItem value="48">48-well plate</MenuItem>
         <MenuItem value="96">96-well plate</MenuItem>
         <MenuItem value="384">384-well plate</MenuItem>

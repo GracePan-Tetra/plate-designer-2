@@ -51,8 +51,8 @@ function SectionHeader({ label, open, onToggle, badge }: SectionHeaderProps) {
             height: 20,
             fontSize: '0.7rem',
             fontWeight: 600,
-            bgcolor: '#EDE9FE',
-            color: '#5B21B6',
+            bgcolor: 'primary.main',
+            color: '#fff',
             mr: 1,
             '& .MuiChip-label': { px: 1 },
           }}
