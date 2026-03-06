@@ -143,12 +143,12 @@ export default function RightPane({
         bgcolor: 'background.paper',
       }}
     >
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, minHeight: 56, borderBottom: '1px solid #E5E7EB', flexShrink: 0 }}>
+        <TuneIcon sx={{ fontSize: '1.1rem', color: 'text.primary' }} />
+        <Typography variant="subtitle1" fontWeight={700}>Display Settings</Typography>
+      </Box>
+
       <Box sx={{ p: 2, overflow: 'auto', flex: 1 }}>
-        {/* Panel header */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-          <TuneIcon sx={{ fontSize: '1.1rem', color: 'text.primary' }} />
-          <Typography variant="subtitle1" fontWeight={700}>Display Settings</Typography>
-        </Box>
 
         {/* VISUALIZATION section */}
         <VisualizationSettings

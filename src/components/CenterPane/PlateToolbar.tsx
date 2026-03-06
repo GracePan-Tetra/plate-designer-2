@@ -25,7 +25,7 @@ export default function PlateToolbar({ assignedCount, totalWells, zoom, onZoomIn
         alignItems: 'center',
         gap: 1,
         px: 2,
-        py: 1.25,
+        minHeight: 56,
         borderBottom: '1px solid #E5E7EB',
         bgcolor: 'background.paper',
       }}

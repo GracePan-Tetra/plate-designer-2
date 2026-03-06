@@ -165,8 +165,8 @@ export default function LeftPane({
       }}
     >
       {/* Configuration header */}
-      <Box sx={{ display: 'flex', alignItems: 'center', px: 2, py: 1.5, borderBottom: '1px solid #E5E7EB', flexShrink: 0 }}>
-        <ScienceIcon sx={{ fontSize: '1.1rem', color: 'primary.main', mr: 1 }} />
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, minHeight: 56, borderBottom: '1px solid #E5E7EB', flexShrink: 0 }}>
+        <ScienceIcon sx={{ fontSize: '1.1rem', color: 'text.primary' }} />
         <Typography variant="subtitle1" fontWeight={700}>Configuration</Typography>
         <Tooltip title="Collapse panel" placement="left">
           <IconButton size="small" onClick={onToggleCollapse} sx={{ ml: 'auto' }}>
