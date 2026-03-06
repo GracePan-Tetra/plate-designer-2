@@ -216,7 +216,18 @@ export default function LeftPane({
 
         {/* ── MAPPING SETTING ── */}
         <Divider />
-        <SectionHeader label="Mapping Setting" open={mappingOpen} onToggle={() => setMappingOpen((v) => !v)} />
+        <SectionHeader
+          label="Mapping Setting"
+          open={mappingOpen}
+          onToggle={() => {
+            const opening = !mappingOpen;
+            setMappingOpen(opening);
+            if (opening) {
+              setScaleOpen(false);
+              setConditionsOpen(false);
+            }
+          }}
+        />
         <Collapse in={mappingOpen} timeout="auto">
           <Box sx={{ px: 2, pb: 2 }}>
             <MappingSettings
