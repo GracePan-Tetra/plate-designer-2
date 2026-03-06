@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Box from '@mui/material/Box';
 import { PlateFormat, WellMap } from '../../types';
 import { PLATE_GEOMETRIES } from '../../utils/serpentine';
@@ -27,6 +28,10 @@ export default function CenterPane({
 }: Props) {
   const geometry = PLATE_GEOMETRIES[plateFormat];
   const assignedCount = Object.keys(wellMap).length;
+  const [zoom, setZoom] = useState(1);
+  const handleZoomIn = () => setZoom((z) => Math.min(2, +(z + 0.1).toFixed(1)));
+  const handleZoomOut = () => setZoom((z) => Math.max(0.5, +(z - 0.1).toFixed(1)));
+
   return (
     <Box
       sx={{
@@ -40,6 +45,9 @@ export default function CenterPane({
       <PlateToolbar
         assignedCount={assignedCount}
         totalWells={geometry.totalWells}
+        zoom={zoom}
+        onZoomIn={handleZoomIn}
+        onZoomOut={handleZoomOut}
         onClear={onClear}
       />
 
@@ -50,6 +58,7 @@ export default function CenterPane({
           hoveredConditionId={hoveredConditionId}
           manualMode={hasSelectedConditions}
           hasSelectedConditions={hasSelectedConditions}
+          zoom={zoom}
           getDisplayColor={getDisplayColor}
           onPaintWell={onPaintWell}
         />

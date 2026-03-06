@@ -10,6 +10,7 @@ interface Props {
   hoveredConditionId: string | null;
   manualMode: boolean;
   hasSelectedConditions: boolean;
+  zoom: number;
   getDisplayColor?: (conditionId: string) => string;
   onPaintWell: (wellKey: string) => void;
 }
@@ -26,6 +27,7 @@ export default function PlateCanvas({
   hoveredConditionId,
   manualMode,
   hasSelectedConditions,
+  zoom,
   getDisplayColor,
   onPaintWell,
 }: Props) {
@@ -57,6 +59,9 @@ export default function PlateCanvas({
           border: '1px solid #E5E7EB',
           p: 2,
           boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+          transform: `scale(${zoom})`,
+          transformOrigin: 'center center',
+          transition: 'transform 0.15s ease',
         }}
       >
         {/* Column header row */}

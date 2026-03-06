@@ -11,10 +11,13 @@ import DownloadIcon from '@mui/icons-material/Download';
 interface Props {
   assignedCount: number;
   totalWells: number;
+  zoom: number;
+  onZoomIn: () => void;
+  onZoomOut: () => void;
   onClear: () => void;
 }
 
-export default function PlateToolbar({ assignedCount, totalWells, onClear }: Props) {
+export default function PlateToolbar({ assignedCount, totalWells, zoom, onZoomIn, onZoomOut, onClear }: Props) {
   return (
     <Box
       sx={{
@@ -35,10 +38,14 @@ export default function PlateToolbar({ assignedCount, totalWells, onClear }: Pro
 
       <Box sx={{ display: 'flex', gap: 0.5, ml: 1 }}>
         <Tooltip title="Zoom in">
-          <IconButton size="small"><ZoomInIcon fontSize="small" /></IconButton>
+          <span>
+            <IconButton size="small" onClick={onZoomIn} disabled={zoom >= 2}><ZoomInIcon fontSize="small" /></IconButton>
+          </span>
         </Tooltip>
         <Tooltip title="Zoom out">
-          <IconButton size="small"><ZoomOutIcon fontSize="small" /></IconButton>
+          <span>
+            <IconButton size="small" onClick={onZoomOut} disabled={zoom <= 0.5}><ZoomOutIcon fontSize="small" /></IconButton>
+          </span>
         </Tooltip>
         <Tooltip title="Download">
           <IconButton size="small"><DownloadIcon fontSize="small" /></IconButton>
